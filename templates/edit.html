@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 text-primary"><i class="bi bi-pencil-square"></i> 编辑图书</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/edit/{{ book.book_id.strip() }}">
+                    <div class="mb-3">
+                        <label for="book_id" class="form-label">图书编号 (ID)</label>
+                        <input type="text" class="form-control" id="book_id" name="book_id" 
+                               value="{{ book.book_id.strip() }}" readonly disabled>
+                        <div class="form-text">图书编号无法修改</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="book_name" class="form-label">书名</label>
+                        <input type="text" class="form-control" id="book_name" name="book_name" 
+                               value="{{ book.book_name }}" required maxlength="50">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="book_isbn" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="book_isbn" name="book_isbn" 
+                                   value="{{ book.book_isbn.strip() }}" required maxlength="17">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="book_author" class="form-label">作者</label>
+                            <input type="text" class="form-control" id="book_author" name="book_author" 
+                                   value="{{ book.book_author }}" required maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="book_publisher" class="form-label">出版社</label>
+                        <input type="text" class="form-control" id="book_publisher" name="book_publisher" 
+                               value="{{ book.book_publisher }}" required maxlength="50">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="book_price" class="form-label">价格</label>
+                            <div class="input-group">
+                                <span class="input-group-text">¥</span>
+                                <input type="number" step="0.01" class="form-control" id="book_price" name="book_price" 
+                                       value="{{ book.book_price }}" required min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="interviews_times" class="form-label">借阅次数</label>
+                            <input type="number" class="form-control" id="interviews_times" name="interviews_times" 
+                                   value="{{ book.interviews_times }}" required min="0">
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="/" class="btn btn-secondary me-md-2">取消</a>
+                        <button type="submit" class="btn btn-primary">更新图书</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
