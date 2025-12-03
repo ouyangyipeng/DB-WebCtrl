@@ -6,8 +6,8 @@ import secrets
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(32)
 
-# Database Configuration
-# Option 1: Windows Authentication (Recommended)
+# 数据库配置
+# win凭证，平时常用
 DB_CONFIG = {
     'driver': 'ODBC Driver 17 for SQL Server',
     'server': 'localhost',
@@ -15,7 +15,7 @@ DB_CONFIG = {
     'trusted_connection': 'yes'
 }
 
-# Option 2: SQL Server Authentication (Uncomment to use)
+# 这是之前实验报告写过的用户连接
 # DB_CONFIG = {
 #     'driver': 'ODBC Driver 17 for SQL Server',
 #     'server': 'localhost',
@@ -45,21 +45,37 @@ def get_db_connection():
 
 @app.route('/')
 def index():
+    search_query = request.args.get('q', '').strip()
+    search_type = request.args.get('search_type', 'book_name')
+
     conn = get_db_connection()
     if not conn:
         flash('无法连接到数据库，请检查配置。', 'danger')
         return render_template('index.html', books=[])
 
     cursor = conn.cursor()
-    # Using dictionary cursor logic manually since pyodbc rows are tuples
-    cursor.execute("SELECT * FROM book")
+    
+    sql = "SELECT * FROM book"
+    params = []
+
+    if search_query:
+        # 防止SQL注入，限制搜索类型
+        allowed_types = ['book_name', 'book_author', 'book_isbn', 'book_publisher', 'book_id']
+        if search_type not in allowed_types:
+            search_type = 'book_name'
+        
+        sql += f" WHERE {search_type} LIKE ?"
+        params.append(f"%{search_query}%")
+
+    # 执行查询
+    cursor.execute(sql, params)
     columns = [column[0] for column in cursor.description]
     books = []
     for row in cursor.fetchall():
         books.append(dict(zip(columns, row)))
     
     conn.close()
-    return render_template('index.html', books=books)
+    return render_template('index.html', books=books, search_query=search_query, search_type=search_type)
 
 @app.route('/add', methods=('GET', 'POST'))
 def add():
