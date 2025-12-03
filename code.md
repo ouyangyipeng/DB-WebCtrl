@@ -33,13 +33,14 @@
 ## 导入与初始化
 
 代码片段：
-
+```python
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pyodbc
 from decimal import Decimal
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for flash messages
+```
 
 讲解：
 - `Flask, render_template, request, redirect, url_for, flash`：Flask 常用组件。
@@ -57,6 +58,7 @@ app.secret_key = 'your_secret_key_here'  # Required for flash messages
 
 代码片段：
 
+```python
 # Database Configuration
 # Option 1: Windows Authentication (Recommended)
 DB_CONFIG = {
@@ -74,6 +76,7 @@ DB_CONFIG = {
 #     'uid': 'admin',
 #     'pwd': 'owen0126'
 # }
+```
 
 讲解：
 - `driver`：ODBC 驱动名称，常见值有 `ODBC Driver 17 for SQL Server`、`ODBC Driver 18 for SQL Server` 等。请根据系统上已安装的驱动修改。
@@ -90,6 +93,7 @@ DB_CONFIG = {
 
 代码片段：
 
+```python
 def get_db_connection():
     conn_str = (
         f"DRIVER={{{DB_CONFIG['driver']}}};"
@@ -108,6 +112,7 @@ def get_db_connection():
     except pyodbc.Error as ex:
         print(f"Database connection failed: {ex}")
         return None
+```
 
 讲解：
 - 该函数负责组装 ODBC 连接字符串并建立连接：
@@ -126,6 +131,7 @@ def get_db_connection():
 
 代码片段：
 
+```python
 @app.route('/')
 def index():
     conn = get_db_connection()
@@ -143,6 +149,7 @@ def index():
     
     conn.close()
     return render_template('index.html', books=books)
+```
 
 讲解：
 - 功能：查询 `book` 表所有行并渲染 `index.html` 模板。
@@ -163,6 +170,7 @@ def index():
 
 代码片段：
 
+```python
 @app.route('/add', methods=('GET', 'POST'))
 def add():
     if request.method == 'POST':
@@ -196,6 +204,7 @@ def add():
             conn.close()
 
     return render_template('add.html')
+```
 
 讲解：
 - GET 请求：渲染 `add.html` 表单页面。
@@ -209,12 +218,14 @@ def add():
 
 示例改进（后端类型转换）：
 
+```python
 try:
     book_price = Decimal(book_price)
     interviews_times = int(interviews_times)
 except ValueError:
     flash('价格或借阅次数格式错误', 'danger')
     return redirect(url_for('add'))
+```
 
 ---
 
@@ -222,6 +233,7 @@ except ValueError:
 
 代码片段：
 
+```python
 @app.route('/edit/<book_id>', methods=('GET', 'POST'))
 def edit(book_id):
     conn = get_db_connection()
@@ -264,6 +276,7 @@ def edit(book_id):
         else:
             flash('未找到该图书', 'warning')
             return redirect(url_for('index'))
+```
 
 讲解：
 - GET 请求：读取 `book_id` 对应的记录并渲染 `edit.html`，模板中显示原始字段供编辑。
@@ -277,6 +290,7 @@ def edit(book_id):
 
 代码片段：
 
+```python
 @app.route('/delete/<book_id>', methods=('POST',))
 def delete(book_id):
     conn = get_db_connection()
@@ -295,6 +309,7 @@ def delete(book_id):
         conn.close()
 
     return redirect(url_for('index'))
+```
 
 讲解：
 - 接受 `POST` 请求执行删除。前端通过一个确认模态框提交删除表单以避免误删。
@@ -307,8 +322,10 @@ def delete(book_id):
 
 代码片段：
 
+```python
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+```
 
 讲解：
 - 入口使用 Flask 自带的开发服务器，`debug=True` 开启调试与自动重载，便于开发，但生产环境中不要启用。

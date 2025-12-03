@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pyodbc
 from decimal import Decimal
+import secrets
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Required for flash messages
+app.secret_key = secrets.token_urlsafe(32)
 
 # Database Configuration
 # Option 1: Windows Authentication (Recommended)
